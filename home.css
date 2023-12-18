@@ -1,0 +1,11 @@
+.bg-black {
+    background-color: black;
+}
+
+.card-corner {
+    border-radius: 16px;
+}
+
+.clickable {
+    cursor: pointer;
+}
