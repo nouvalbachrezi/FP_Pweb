@@ -1,0 +1,7 @@
+.login-registrasi-background {
+    background-image: linear-gradient(to bottom left, rgba(22, 102, 215), rgba(22, 203, 182));
+}
+
+.rounded-corners {
+    border-radius: 32px;
+}
