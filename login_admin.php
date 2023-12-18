@@ -8,7 +8,7 @@
     if (!isset($_SESSION["izin"])) {
 
         $attribute = array(
-            "nomor_induk_kependudukan", "password"
+            "username", "password"
         );
         $data_complete = true;
         $data_needed = count($attribute);
@@ -20,26 +20,26 @@
         }
     
         if ($data_complete) {
-            $nik = $_POST["nomor_induk_kependudukan"];
+            $username = $_POST["username"];
             $password = $_POST["password"];
     
             $hashed_password = md5($password);
-            $query = "SELECT u_id FROM user WHERE u_nik = '$nik' AND u_password = '$hashed_password'";
+            $query = "SELECT a_id FROM admin WHERE a_username = '$username' AND a_password = '$hashed_password'";
             
             $result = mysqli_query($connection, $query);
 
             if ($result && mysqli_num_rows($result) == 1) {
                 $data = mysqli_fetch_array($result);
-                $_SESSION["izin"] = "user";
-                $_SESSION["id"] = $data["u_id"];
-                header("Location: ../client/home.php");
+                $_SESSION["izin"] = "admin";
+                $_SESSION["id"] = $data["a_id"];
+                header("Location: ../client/admin/home.php");
             }
             else {
-                header("Location: ../client/login.php?message=tidak dapat masuk");
+                header("Location: ../client/admin/login.php?message=tidak dapat masuk");
             }
         }
         else {
-            header("Location: ../client/login.php?message=data tidak lengkap");
+            header("Location: ../client/admin/login.php?message=data tidak lengkap");
         }
     }
     else {
@@ -50,7 +50,7 @@
             header("Location: ../client/admin/home.php");
         }
         else {
-            header("Location: ../client/login.php");
+            header("Location: ../client/admin/login.php");
         }
     }
 ?>

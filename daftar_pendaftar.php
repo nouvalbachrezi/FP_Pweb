@@ -5,10 +5,12 @@
         session_start();
     }
 
-    if (!isset($_SESSION["izin"])) {
+    if (isset($_SESSION["izin"]) && $_SESSION["izin"] == "admin") {
+
+        $_POST = json_decode(file_get_contents('php://input'), true);
 
         $attribute = array(
-            "nomor_induk_kependudukan", "password"
+            "kategori"
         );
         $data_complete = true;
         $data_needed = count($attribute);
@@ -19,27 +21,20 @@
             }
         }
     
+        $data = array();
         if ($data_complete) {
-            $nik = $_POST["nomor_induk_kependudukan"];
-            $password = $_POST["password"];
+            $kategori = $_POST["kategori"];
     
-            $hashed_password = md5($password);
-            $query = "SELECT u_id FROM user WHERE u_nik = '$nik' AND u_password = '$hashed_password'";
-            
+            $query = "SELECT u_id, u_nama_lengkap, u_status_pendaftaran FROM user WHERE u_status_pendaftaran = '$kategori'";
             $result = mysqli_query($connection, $query);
 
-            if ($result && mysqli_num_rows($result) == 1) {
-                $data = mysqli_fetch_array($result);
-                $_SESSION["izin"] = "user";
-                $_SESSION["id"] = $data["u_id"];
-                header("Location: ../client/home.php");
+            if ($result) {
+
+                while($row = mysqli_fetch_array($result)) {
+                    $data[] = $row;
+                }
             }
-            else {
-                header("Location: ../client/login.php?message=tidak dapat masuk");
-            }
-        }
-        else {
-            header("Location: ../client/login.php?message=data tidak lengkap");
+            echo json_encode($data);
         }
     }
     else {

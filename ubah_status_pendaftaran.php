@@ -5,10 +5,12 @@
         session_start();
     }
 
-    if (!isset($_SESSION["izin"])) {
+    if (isset($_SESSION["izin"]) && $_SESSION["izin"] == "admin") {
+
+        $_POST = json_decode(file_get_contents('php://input'), true);
 
         $attribute = array(
-            "nomor_induk_kependudukan", "password"
+            "user_id", "status_pendaftaran"
         );
         $data_complete = true;
         $data_needed = count($attribute);
@@ -20,26 +22,23 @@
         }
     
         if ($data_complete) {
-            $nik = $_POST["nomor_induk_kependudukan"];
-            $password = $_POST["password"];
+            $user_id = $_POST["user_id"];
+            $status_pendaftaran = $_POST["status_pendaftaran"];
     
-            $hashed_password = md5($password);
-            $query = "SELECT u_id FROM user WHERE u_nik = '$nik' AND u_password = '$hashed_password'";
-            
+            if ($status_pendaftaran == "Lolos") {
+                $query = "CALL lolos_berkas($user_id)";
+            }
+            else if ($status_pendaftaran == "Revisi Data") {
+                $query = "UPDATE user SET u_status_pendaftaran = 'Revisi Data' WHERE u_id = $user_id AND u_status_pendaftaran = 'Menunggu Verifikasi'";
+            }
             $result = mysqli_query($connection, $query);
 
-            if ($result && mysqli_num_rows($result) == 1) {
-                $data = mysqli_fetch_array($result);
-                $_SESSION["izin"] = "user";
-                $_SESSION["id"] = $data["u_id"];
-                header("Location: ../client/home.php");
+            if ($result) {
+                echo json_encode("Success");
             }
             else {
-                header("Location: ../client/login.php?message=tidak dapat masuk");
+                echo json_encode("Failed");
             }
-        }
-        else {
-            header("Location: ../client/login.php?message=data tidak lengkap");
         }
     }
     else {
